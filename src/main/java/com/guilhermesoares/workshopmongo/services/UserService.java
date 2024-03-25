@@ -1,6 +1,7 @@
 package com.guilhermesoares.workshopmongo.services;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,22 @@ public class UserService {
 		repo.deleteById(id);
 	}
 	
+	public User update(User obj) {
+		try {
+			Optional<User> newObj = repo.findById(obj.getId());
+			User dtbObj = newObj.orElseThrow(NoSuchElementException::new);
+			updateData(dtbObj, obj);
+			return repo.save(dtbObj);
+		}catch(NoSuchElementException e) {
+			throw new ObjectNotFoundException("Object not Found");
+		}
+	}
+	
+	private void updateData(User dtbObj, User routeObj) {
+		dtbObj.setName(routeObj.getName());
+		dtbObj.setEmail(routeObj.getEmail());
+	}
+
 	public User fromDTO(UserDTO objDto) {
 		return new User(objDto.getId(), objDto.getName(), objDto.getEmail());
 	}
